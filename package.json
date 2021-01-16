@@ -1,22 +1,28 @@
 {
-  "name": "server",
+  "name": "AdsServer",
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "nodemon — exec babel-node ./bin/www"
   },
   "dependencies": {
+    "body-parser": "^1.19.0",
     "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
     "debug": "~2.6.9",
-    "express": "~4.16.1",
+    "express": "^4.16.4",
     "fs-extra": "^9.0.1",
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
+    "mysql2": "^2.2.5",
     "pug": "^3.0.0",
-    "sql": "^0.78.0"
+    "save": "^2.4.0"
   },
   "devDependencies": {
-    "ts-node": "^9.1.1",
-    "typescript": "^4.1.3"
+    "@babel/cli": "^7.12.10",
+    "@babel/core": "^7.12.10",
+    "@babel/node": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "nodemon": "^2.0.7"
   }
 }
