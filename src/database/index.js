@@ -49,21 +49,22 @@ module.exports = class Database {
 
     async addUser(newUser) {
         try {
-            await this.connection.query(insertUser, newUser)
-            console.log("Данные добавлены");
+            await this.connection.query(insertUser, newUser);
+            return true;
         } catch (err) {
+            return false;
             console.log(err)
         }
     }
 
     async findUser(user) {
+        console.log(user)
         try {
             const result = await this.connection.query(findUser, user);
             if (result.length < 1) {
                 return null;
             }
             return result[0];
-            console.log("Данные найдены");
         } catch (err) {
             console.log(err);
             return null;
