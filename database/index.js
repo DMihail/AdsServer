@@ -1,49 +1,43 @@
-// const mysql = require("mysql2");
-import mysql from 'mysql2'
+const mysql = require('mysql2');
+const {createUserTable, createBase, useBase} = require('./mySqlCommand');
 
-
-
-
-
-
-connection.query("USE usersdb2",
-    function(err, results) {
-        if(err) console.log(err);
-        else console.log("База данных используется");
-    });
-
-
-
-const sql = `create table if not exists users(
-  id int primary key auto_increment,
-  name varchar(255) not null,
-  email nvarchar(255) not null,
-  password nvarchar(255) not null,
-  phone nvarchar(255) not null
-)`;
-
-connection.query(sql, function(err, results) {
-    if(err) console.log(err);
-    else console.log("Таблица создана");
-});
-connection.end();
-
-export default class Database {
+module.exports = class Database {
     constructor() {
         this.connection = mysql.createConnection({
             host: "localhost",
             user: "root",
-            // database: "usersdb",
             password: "root"
         });
+        this.createBase();
     }
 
     createBase() {
-        connection.query("CREATE DATABASE IF NOT EXISTS AdsServer ",
-            function(err, results) {
-                if(err) console.log(err);
-                else console.log("База данных создана");
-            });
+        try {
+            this.connection.query(createBase)
+            console.log("База данных создана");
+        } catch (err){
+            console.log(err);
+        }
+        this.useBase();
+    }
+
+    useBase() {
+        try {
+            this.connection.query(useBase)
+            console.log("База данных используется");
+        } catch (err) {
+            console.log(err);
+        }
+        this.createTable();
+    }
+
+    createTable(){
+        try{
+            this.connection.query(createUserTable);
+            console.log("Таблица создана");
+        } catch (err) {
+            console.log(err);
+        }
     }
 }
 
