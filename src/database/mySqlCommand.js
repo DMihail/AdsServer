@@ -34,7 +34,7 @@ const selectItem = `SELECT * FROM items WHERE user=? AND id=?`;
 
 const uploadImage = `UPDATE items SET image=? WHERE name=?`;
 
-const updateItem = `UPDATE items SET title=? AND price=& WHERE id=? AND user=&`;
+const updateItem = `UPDATE items SET title=? AND price=? WHERE id=? AND user=?`;
 
 const deleteItem = `DELETE FROM items WHERE user=? AND id=?`;
 

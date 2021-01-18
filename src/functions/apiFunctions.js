@@ -107,7 +107,7 @@ const updateItem = async (req, res) => {
     if (user) {
         const person = await base.findUser([user.email, user.password]);
         const {id, phone, name, email} = person[0];
-        const userData = [req.body.title, req.body.price, JSON.stringify({id, phone, email, name}), req.params.id];
+        const userData = [req.body.title, req.body.price,  req.params.id, JSON.stringify({id, phone, email, name}),];
         const item = await base.updateItem(userData, id);
         res.status(200).send(item);
     }

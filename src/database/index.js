@@ -123,7 +123,6 @@ module.exports = class Database {
     }
 
     async deleteItem(item) {
-        console.log(user)
         try {
             const result = await this.connection.query(deleteItem, item);
             return result[0];
