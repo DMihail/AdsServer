@@ -1,5 +1,5 @@
 const Database = require('../database/index');
-const {createToken} = require('./jwt');
+const {createToken, verifyToken} = require('./jwt');
 const base = new Database();
 
 const login = async (req, res) => {
@@ -28,12 +28,19 @@ const registration = async(req, res) => {
     }
 }
 
-const getCurrentUser = async(req, res) => {
-    // console.log(req)
-    // const newUser = [req.name, req.email, req.password, req.phone];
-    // console.log(newUser)
-    // await base.findUser([req.email, req.password]);
-    // // base.addUser(newUser);
+const getCurrentUser = async(authorization, res) => {
+    const user = verifyToken(authorization);
+    const userData = await base.findUser([user.email, user.password]);
+    if (userData) {
+        res.status(200).send({
+        "id": userData[0].id,
+        "phone": userData[0].phone,
+        "name": userData[0].name,
+        "email": userData[0].email
+        });
+    } else {
+        res.status(401);
+    }
 }
 
 

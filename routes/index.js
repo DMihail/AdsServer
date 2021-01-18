@@ -19,7 +19,7 @@ router.post('/api/register', jsonParser, async function(req, res, next) {
 });
 
 router.get('/api/me', async function(req, res, next) {
-  await getCurrentUser(req.body, res);
+  await getCurrentUser(req.headers.authorization, res);
 });
 
 module.exports = router;
