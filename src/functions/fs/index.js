@@ -9,7 +9,7 @@ const createFolders = (path) => {
 
 const saveImage = (req, res, path) => {
     req.pipe(
-        fs.createWriteStream(`${path}/file.jpg`)
+        fs.createWriteStream(path)
     ).on('finish', () => res.end('ok'));
 }
 

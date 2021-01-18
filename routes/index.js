@@ -3,8 +3,7 @@ const bodyParser = require('body-parser');
 const {login, registration, getCurrentUser, uploadItemImage, createItem, getItems, getItem, updateItem, deleteItem} = require('../src/functions/apiFunctions');
 const router = express.Router();
 const jsonParser = bodyParser.json();
-const urlencodedParser = bodyParser.urlencoded({extended: false});
-const fs = require('fs-extra');
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });

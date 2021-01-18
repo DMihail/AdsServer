@@ -1,5 +1,6 @@
 const mysql = require('mysql2/promise');
-const {massTable, createBase, useBase, insertUser, findUser, insertItem, uploadImage, selectAllItems, selectItem, updateItem, deleteItem} = require('./mySqlCommand');
+const {massTable, createBase, useBase, insertUser,
+    findUser, insertItem, uploadImage, selectAllItems, selectItem, updateItem, deleteItem} = require('./mySqlCommand');
 
 module.exports = class Database {
     constructor() {

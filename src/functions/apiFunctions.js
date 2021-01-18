@@ -1,6 +1,6 @@
-const Database = require('../database/index');
+const Database = require('./database/index');
 const {createToken, verifyToken} = require('./jwt');
-const {createFolders, saveImage} = require('../fs/index');
+const {createFolders, saveImage} = require('./fs/index');
 const base = new Database();
 
 const login = async (req, res) => {
@@ -46,12 +46,13 @@ const getCurrentUser = async(authorization, res) => {
 
 const uploadItemImage = (req, res) => {
     const user = verifyToken(req.headers.authorization);
-    if (user) {
-
+    const pathPart = ['images', `/${user.email}`, `/${req.params.id}`]
+    let path = '';
+    for (let i = 0; i < pathPart.length; i++) {
+        path += pathPart[i];
+        createFolders(path);
     }
-    req.pipe(
-        fs.createWriteStream(`file2.jpg`)
-    ).on('finish', () => res.end('ok'));
+    saveImage(req, res, path + "/image.jpg")
 }
 
 const createItem = async (req, res) => {
