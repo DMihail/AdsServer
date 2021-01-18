@@ -32,7 +32,7 @@ const selectAllItems = `SELECT * FROM items WHERE user=?`;
 
 const selectItem = `SELECT * FROM items WHERE user=? AND id=?`;
 
-const uploadImage = `UPDATE items SET image=? WHERE name=?`;
+const uploadImage = `UPDATE items SET image=? WHERE id=? AND user=?`;
 
 const updateItem = `UPDATE items SET title=? AND price=? WHERE id=? AND user=?`;
 

@@ -41,7 +41,7 @@ router.post('/api/register', jsonParser, async function(req, res, next) {
 });
 
 router.post('/api/items/:id/images', jsonParser, async function(req, res, next) {
- await uploadItemImage(req, res);
+  await uploadItemImage(req, res);
 });
 
 router.post('/api/items', jsonParser, async function(req, res, next) {

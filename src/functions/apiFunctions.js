@@ -44,15 +44,24 @@ const getCurrentUser = async(authorization, res) => {
     }
 }
 
-const uploadItemImage = (req, res) => {
+const uploadItemImage = async (req, res) => {
     const user = verifyToken(req.headers.authorization);
-    const pathPart = ['images', `/${user.email}`, `/${req.params.id}`]
-    let path = '';
+    const mimeType = req.headers['content-type'].split('/')[1];
+
+    const person = await base.findUser([user.email, user.password]);
+
+    const {id, phone, name, email} = person[0];
+    const pathPart = [`/${id}`, `/${req.params.id}`]
+    let path = 'public/images';
     for (let i = 0; i < pathPart.length; i++) {
         path += pathPart[i];
         createFolders(path);
     }
-    saveImage(req, res, path + "/image.jpg")
+    path = `${path}/image.${mimeType}`
+
+    const item = [path, req.params.id, JSON.stringify({id, phone, email, name})];
+    await base.updateItemImage(item);
+    saveImage(req, res, path);
 }
 
 const createItem = async (req, res) => {

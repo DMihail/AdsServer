@@ -83,7 +83,7 @@ module.exports = class Database {
         }
     }
 
-    async updateItemImage(params, image) {
+    async updateItemImage(params) {
         try {
             await this.connection.query(uploadImage, params);
         } catch (err) {
