@@ -1,6 +1,7 @@
 const mysql = require('mysql2/promise');
 const {massTable, createBase, useBase, insertUser,
-    findUser, insertItem, uploadImage, selectAllItems, selectItem, updateItem, deleteItem} = require('./mySqlCommand');
+    findUser, insertItem, uploadImage, selectAllItems,
+    selectItem, updateItem, deleteItem} = require('./mySqlCommand');
 
 module.exports = class Database {
     constructor() {
@@ -65,6 +66,20 @@ module.exports = class Database {
         try {
             const result = await this.connection.query(findUser, user);
             if (result.length < 1) {
+                return false;
+            }
+            return true;
+        } catch (err) {
+            console.log(err);
+            return null;
+        }
+    }
+
+
+    async getUser(user) {
+        try {
+            const result = await this.connection.query(findUser, user);
+            if (result.length < 1) {
                 return null;
             }
             return result[0];
@@ -73,6 +88,7 @@ module.exports = class Database {
             return null;
         }
     }
+
 
     async createItem(item) {
         try {

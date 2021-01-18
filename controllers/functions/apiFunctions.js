@@ -1,10 +1,10 @@
-const Database = require('./database/index');
+const Database = require('../database/index');
 const {createToken, verifyToken} = require('./jwt');
-const {createFolders, saveImage} = require('./fs/index');
+const {createFolders, saveImage} = require('../fs/index');
 const base = new Database();
 
 const login = async (req, res) => {
-    const user = await base.findUser([req.email, req.password]);
+    const user = await base.getUser([req.email, req.password]);
     if (user) {
         res.status(200).send({"token": createToken(user)});
     } else {
@@ -13,6 +13,12 @@ const login = async (req, res) => {
                     "message":"Wrong email or password"
                 });
     }
+}
+
+const getUserData = async (authorization) => {
+    const user = verifyToken(authorization);
+    const data = await base.getUser([user.email, user.password]);
+    return  {id, phone, name, email} = data[0];
 }
 
 const registration = async(req, res) => {
@@ -30,8 +36,7 @@ const registration = async(req, res) => {
 }
 
 const getCurrentUser = async(authorization, res) => {
-    const user = verifyToken(authorization);
-    const userData = await base.findUser([user.email, user.password]);
+    const userData = await getUserData(authorization);
     if (userData) {
         res.status(200).send({
         "id": userData[0].id,
@@ -45,12 +50,9 @@ const getCurrentUser = async(authorization, res) => {
 }
 
 const uploadItemImage = async (req, res) => {
-    const user = verifyToken(req.headers.authorization);
     const mimeType = req.headers['content-type'].split('/')[1];
+    const {id, phone, name, email} = await getUserData(req.headers.authorization);
 
-    const person = await base.findUser([user.email, user.password]);
-
-    const {id, phone, name, email} = person[0];
     const pathPart = [`/${id}`, `/${req.params.id}`]
     let path = 'public/images';
     for (let i = 0; i < pathPart.length; i++) {
@@ -58,18 +60,21 @@ const uploadItemImage = async (req, res) => {
         createFolders(path);
     }
     path = `${path}/image.${mimeType}`;
+
     saveImage(req, res, path);
-    path = path.replace('public', 'http://localhost:3000')
+
+    path = path.replace('public', 'http://localhost:3000');
+
     const item = [path, req.params.id, JSON.stringify({id, phone, email, name})];
     await base.updateItemImage(item);
 }
 
 const createItem = async (req, res) => {
-    const user = verifyToken(req.headers.authorization);
+
     const date = new Date();
-    const person = await base.findUser([user.email, user.password]);
-    const {id, phone, name, email} = person[0];
+    const {id, phone, name, email} = await getUserData(req.headers.authorization);
     const item = [date, req.body.title, req.body.price, "", person[0].id, JSON.stringify({id, phone, email, name})];
+
     if (user) {
         await base.createItem(item);
         res.status(200).send(item);
@@ -79,48 +84,32 @@ const createItem = async (req, res) => {
 }
 
 const getItems = async (authorization, res) => {
-    const user = verifyToken(authorization);
-    if (user) {
-        const person = await base.findUser([user.email, user.password]);
-        const {id, phone, name, email} = person[0];
+        const {id, phone, name, email} = await getUserData(authorization);
         const userData = JSON.stringify({id, phone, email, name});
         const items = await base.getItems(userData);
         res.status(200).send(items);
-    }
 }
 
 
 const getItem = async (req, res) => {
-    const user = verifyToken(req.headers.authorization);
-    if (user) {
-        const person = await base.findUser([user.email, user.password]);
-        const {id, phone, name, email} = person[0];
+        const {id, phone, name, email} = getUserData(req.headers.authorization);
         const userData = [JSON.stringify({id, phone, email, name}), req.params.id];
         const item = await base.getItem(userData, id);
         res.status(200).send(item);
-    }
 }
 
 const deleteItem = async (req, res) => {
-    const user = verifyToken(req.headers.authorization);
-    if (user) {
-        const person = await base.findUser([user.email, user.password]);
-        const {id, phone, name, email} = person[0];
+        const {id, phone, name, email} = getUserData(req.headers.authorization);
         const userData = [JSON.stringify({id, phone, email, name}), req.params.id];
         const item = await base.deleteItem(userData, id);
         res.status(200).send(item);
-    }
 }
 
 const updateItem = async (req, res) => {
-    const user = verifyToken(req.headers.authorization);
-    if (user) {
-        const person = await base.findUser([user.email, user.password]);
-        const {id, phone, name, email} = person[0];
+        const {id, phone, name, email} = getUserData(req.headers.authorization);
         const userData = [req.body.title, req.body.price,  req.params.id, JSON.stringify({id, phone, email, name}),];
         const item = await base.updateItem(userData, id);
         res.status(200).send(item);
-    }
 }
 
 
