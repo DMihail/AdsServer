@@ -1,5 +1,5 @@
 const mysql = require('mysql2/promise');
-const {massTable, createBase, useBase, insertUser, findUser} = require('./mySqlCommand');
+const {massTable, createBase, useBase, insertUser, findUser, insertItem, uploadImage, selectAllItems, selectItem, updateItem, deleteItem} = require('./mySqlCommand');
 
 module.exports = class Database {
     constructor() {
@@ -61,7 +61,6 @@ module.exports = class Database {
     }
 
     async findUser(user) {
-        console.log(user)
         try {
             const result = await this.connection.query(findUser, user);
             if (result.length < 1) {
@@ -73,5 +72,66 @@ module.exports = class Database {
             return null;
         }
     }
+
+    async createItem(item) {
+        try {
+           await this.connection.query(insertItem, item);
+        } catch (err) {
+            console.log(err);
+            return null;
+        }
+    }
+
+    async updateItemImage(params, image) {
+        try {
+            await this.connection.query(uploadImage, params);
+        } catch (err) {
+            console.log(err);
+            return null;
+        }
+    }
+
+    async getItems(user) {
+        try {
+           const result = await this.connection.query(selectAllItems, user);
+           return result[0];
+        } catch (err) {
+            console.log(err);
+            return [];
+        }
+    }
+
+    async getItem(user) {
+        console.log(user)
+        try {
+            const result = await this.connection.query(selectItem, user);
+            return result[0];
+        } catch (err) {
+            console.log(err);
+            return [];
+        }
+    }
+
+    async updateItem(item) {
+        try {
+            const result = await this.connection.query(updateItem, item);
+            return result[0];
+        } catch (err) {
+            console.log(err);
+            return [];
+        }
+    }
+
+    async deleteItem(item) {
+        console.log(user)
+        try {
+            const result = await this.connection.query(deleteItem, item);
+            return result[0];
+        } catch (err) {
+            console.log(err);
+            return [];
+        }
+    }
+
 }
 

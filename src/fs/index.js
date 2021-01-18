@@ -9,6 +9,11 @@ const createFolders = (path) => {
 
 const saveImage = (req, res, path) => {
     req.pipe(
-        fs.createWriteStream(`${path}/file2.jpg`)
+        fs.createWriteStream(`${path}/file.jpg`)
     ).on('finish', () => res.end('ok'));
+}
+
+module.exports = {
+    createFolders,
+    saveImage,
 }

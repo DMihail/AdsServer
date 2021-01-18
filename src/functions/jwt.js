@@ -9,11 +9,16 @@ const createToken = (user) => {
 }
 
 const verifyToken = (token) => {
-     const data = jwt.verify(token, secret);
-     return {
-         email: data.email,
-         password: decipher(data.password)
-     }
+    try {
+        const data = jwt.verify(token, secret);
+        return {
+            email: data.email,
+            password: decipher(data.password)
+        }
+    }catch (err) {
+        console.log("err verify token")
+        return null;
+    }
 }
 
 module.exports = {

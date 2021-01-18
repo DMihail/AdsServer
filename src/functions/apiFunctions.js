@@ -1,5 +1,6 @@
 const Database = require('../database/index');
 const {createToken, verifyToken} = require('./jwt');
+const {createFolders, saveImage} = require('../fs/index');
 const base = new Database();
 
 const login = async (req, res) => {
@@ -43,13 +44,75 @@ const getCurrentUser = async(authorization, res) => {
     }
 }
 
-const uploadItemImage = (body, res) => {
-    console.log(body)
+const uploadItemImage = (req, res) => {
+    const user = verifyToken(req.headers.authorization);
+    if (user) {
+
+    }
+    req.pipe(
+        fs.createWriteStream(`file2.jpg`)
+    ).on('finish', () => res.end('ok'));
 }
 
 const createItem = async (req, res) => {
+    const user = verifyToken(req.headers.authorization);
+    const date = new Date();
+    const person = await base.findUser([user.email, user.password]);
+    const {id, phone, name, email} = person[0];
+    const item = [date, req.body.title, req.body.price, "", person[0].id, JSON.stringify({id, phone, email, name})];
+    if (user) {
+        await base.createItem(item);
+        res.status(200).send(item);
+    } else {
 
+    }
 }
+
+const getItems = async (authorization, res) => {
+    const user = verifyToken(authorization);
+    if (user) {
+        const person = await base.findUser([user.email, user.password]);
+        const {id, phone, name, email} = person[0];
+        const userData = JSON.stringify({id, phone, email, name});
+        const items = await base.getItems(userData);
+        res.status(200).send(items);
+    }
+}
+
+
+const getItem = async (req, res) => {
+    const user = verifyToken(req.headers.authorization);
+    if (user) {
+        const person = await base.findUser([user.email, user.password]);
+        const {id, phone, name, email} = person[0];
+        const userData = [JSON.stringify({id, phone, email, name}), req.params.id];
+        const item = await base.getItem(userData, id);
+        res.status(200).send(item);
+    }
+}
+
+const deleteItem = async (req, res) => {
+    const user = verifyToken(req.headers.authorization);
+    if (user) {
+        const person = await base.findUser([user.email, user.password]);
+        const {id, phone, name, email} = person[0];
+        const userData = [JSON.stringify({id, phone, email, name}), req.params.id];
+        const item = await base.deleteItem(userData, id);
+        res.status(200).send(item);
+    }
+}
+
+const updateItem = async (req, res) => {
+    const user = verifyToken(req.headers.authorization);
+    if (user) {
+        const person = await base.findUser([user.email, user.password]);
+        const {id, phone, name, email} = person[0];
+        const userData = [req.body.title, req.body.price, JSON.stringify({id, phone, email, name}), req.params.id];
+        const item = await base.updateItem(userData, id);
+        res.status(200).send(item);
+    }
+}
+
 
 
 module.exports = {
@@ -57,5 +120,9 @@ module.exports = {
     registration,
     getCurrentUser,
     uploadItemImage,
-    createItem
+    createItem,
+    getItems,
+    getItem,
+    updateItem,
+    deleteItem
 }
