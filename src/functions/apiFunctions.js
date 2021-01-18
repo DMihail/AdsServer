@@ -43,9 +43,13 @@ const getCurrentUser = async(authorization, res) => {
     }
 }
 
+const uploadItemImage = (body, res) => {
+    console.log(body)
+}
 
 module.exports = {
     login,
     registration,
-    getCurrentUser
+    getCurrentUser,
+    uploadItemImage
 }
