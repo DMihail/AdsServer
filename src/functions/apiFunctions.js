@@ -57,11 +57,11 @@ const uploadItemImage = async (req, res) => {
         path += pathPart[i];
         createFolders(path);
     }
-    path = `${path}/image.${mimeType}`
-
+    path = `${path}/image.${mimeType}`;
+    saveImage(req, res, path);
+    path = path.replace('public', 'http://localhost:3000')
     const item = [path, req.params.id, JSON.stringify({id, phone, email, name})];
     await base.updateItemImage(item);
-    saveImage(req, res, path);
 }
 
 const createItem = async (req, res) => {
