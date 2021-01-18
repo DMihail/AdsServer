@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const {login, registration, getCurrentUser, uploadItemImage} = require('../src/functions/apiFunctions');
+const {login, registration, getCurrentUser, uploadItemImage, createItem} = require('../src/functions/apiFunctions');
 const router = express.Router();
 const jsonParser = bodyParser.json();
 const urlencodedParser = bodyParser.urlencoded({extended: false});
@@ -30,6 +30,8 @@ router.post('/api/items/:id/images', jsonParser, async function(req, res, next) 
   ).on('finish', () => res.end('ok'));
 });
 
-
+router.post('/api/items ', jsonParser, async function(req, res, next) {
+  await createItem();
+});
 
 module.exports = router;

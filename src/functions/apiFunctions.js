@@ -47,9 +47,15 @@ const uploadItemImage = (body, res) => {
     console.log(body)
 }
 
+const createItem = async (req, res) => {
+
+}
+
+
 module.exports = {
     login,
     registration,
     getCurrentUser,
-    uploadItemImage
+    uploadItemImage,
+    createItem
 }

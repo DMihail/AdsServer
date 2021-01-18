@@ -1,5 +1,5 @@
 const mysql = require('mysql2/promise');
-const {createUserTable, createBase, useBase, insertUser, findUser} = require('./mySqlCommand');
+const {massTable, createBase, useBase, insertUser, findUser} = require('./mySqlCommand');
 
 module.exports = class Database {
     constructor() {
@@ -35,12 +35,15 @@ module.exports = class Database {
         } catch (err) {
             console.log(err);
         }
-        await this.createTable();
+
+        for (let i = 0; i < massTable.length; i++) {
+            await this.createTable(massTable[i]);
+        }
     }
 
-    async createTable(){
+    async createTable(table){
         try{
-            await this.connection.query(createUserTable);
+            await this.connection.query(table);
             console.log("Таблица создана");
         } catch (err) {
             console.log(err);
