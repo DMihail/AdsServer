@@ -112,6 +112,9 @@ const updateItem = async (req, res) => {
         res.status(200).send(item);
 }
 
+const findUserFromBase = async (email, password) => {
+    return await base.findUser([email, password]);
+}
 
 
 module.exports = {
@@ -123,5 +126,6 @@ module.exports = {
     getItems,
     getItem,
     updateItem,
-    deleteItem
+    deleteItem,
+    findUserFromBase
 }

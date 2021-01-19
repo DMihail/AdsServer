@@ -1,4 +1,5 @@
 const express = require('express');
+const passport = require('passport');
 const {login, registration, getCurrentUser, uploadItemImage,
   createItem, getItems, getItem, updateItem, deleteItem} = require('../controllers/functions/apiFunctions');
 const router = express.Router();
@@ -31,7 +32,7 @@ router.delete('/api/items/:id', async function(req, res, next) {
   await deleteItem(req, res);
 });
 
-router.post('/api/login', async function(req, res, next) {
+router.post('/api/login', passport.authenticate('local', { session: false }), async function(req, res, next) {
   await login(req.body, res);
 });
 
