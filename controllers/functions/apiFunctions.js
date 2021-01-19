@@ -74,14 +74,36 @@ const uploadItemImage = async (req, res) => {
 const createItem = async (req, res) => {
 
     const date = new Date();
-    const {id, phone, name, email} = await getUserData(req.headers.authorization);
-    const item = [date, req.body.title, req.body.price, "", person[0].id, JSON.stringify({id, phone, email, name})];
+    const data = await getUserData(req.headers.authorization);
 
-    if (user) {
-        await base.createItem(item);
-        res.status(200).send(item);
+    if (data) {
+        const {id, phone, name, email} = data;
+        const item = [date, req.body.title, req.body.price, "", id, JSON.stringify({id, phone, email, name})];
+
+        const result = await base.createItem(item);
+
+        const endItem = {
+            id: result.insertId,
+            created_at: date,
+            title: req.body.title,
+            price: req.body.price,
+            image: "",
+            user_id: id,
+            user: {
+                id: id,
+                phone: phone,
+                name: name,
+                email: email
+            }
+        }
+
+        if (!result) {
+            res.status(403).send({});
+        } else {
+            res.status(200).send(endItem);
+        }
     } else {
-
+        res.status(401).send({});
     }
 }
 

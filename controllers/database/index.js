@@ -92,8 +92,10 @@ module.exports = class Database {
 
     async createItem(item) {
         try {
-           await this.connection.query(insertItem, item);
+           const result = await this.connection.query(insertItem, item);
+           return result[0];
         } catch (err) {
+            console.log(1111111111111)
             console.log(err);
             return null;
         }
