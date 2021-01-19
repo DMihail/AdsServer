@@ -65,8 +65,8 @@ module.exports = class Database {
     async findUser(user) {
         try {
             const result = await this.connection.query(findUser, user);
-            if (result.length < 1) {
-                return false;
+            if (result[0].length < 1) {
+               return false;
             }
             return true;
         } catch (err) {

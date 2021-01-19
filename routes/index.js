@@ -32,8 +32,18 @@ router.delete('/api/items/:id', async function(req, res, next) {
   await deleteItem(req, res);
 });
 
-router.post('/api/login', passport.authenticate('local', { session: false }), async function(req, res, next) {
-  await login(req.body, res);
+
+router.post('/api/login', function(req, res, next) {
+  passport.authenticate('local', async function(err, user, info) {
+    if (user) {
+      await login(req.body, res);
+    } else {
+      res.status(422).send({
+        "field":"password",
+        "message":"Wrong email or password"
+      });
+    }
+  })(req, res, next);
 });
 
 router.post('/api/register',  async function(req, res, next) {

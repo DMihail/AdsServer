@@ -5,20 +5,21 @@ const base = new Database();
 
 const login = async (req, res) => {
     const user = await base.getUser([req.email, req.password]);
+    console.log(user)
     if (user) {
         res.status(200).send({"token": createToken(user)});
-    } else {
-        res.status(422).send({
-                    "field":"password",
-                    "message":"Wrong email or password"
-                });
     }
 }
 
 const getUserData = async (authorization) => {
     const user = verifyToken(authorization);
-    const data = await base.getUser([user.email, user.password]);
-    return  {id, phone, name, email} = data[0];
+    if (!user) {
+        return null;
+    }
+
+    const data = await base.getUser([user.email, user.password ]);
+    return {id, phone, name, email} = data[0];
+
 }
 
 const registration = async(req, res) => {
@@ -37,15 +38,16 @@ const registration = async(req, res) => {
 
 const getCurrentUser = async(authorization, res) => {
     const userData = await getUserData(authorization);
+    console.log(userData)
     if (userData) {
         res.status(200).send({
-        "id": userData[0].id,
-        "phone": userData[0].phone,
-        "name": userData[0].name,
-        "email": userData[0].email
+        "id": userData.id,
+        "phone": userData.phone,
+        "name": userData.name,
+        "email": userData.email
         });
     } else {
-        res.status(401);
+        res.status(401).send({});
     }
 }
 
