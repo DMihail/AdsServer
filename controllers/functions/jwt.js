@@ -4,8 +4,10 @@ const {secret} = require('../../config/index');
 
 
 const createToken = (user) => {
-    const password = createCrypto(user[0].password);
-    return  jwt.sign({email: user[0].email,  password}, secret, {expiresIn: 60 * 60});
+    const password = user[0] ? user[0].password : user.password;
+    const email = user[0] ? user[0].email : user.email;
+    const crypto = createCrypto(password);
+    return  jwt.sign({email,  crypto}, secret, {expiresIn: 60 * 60});
 }
 
 const verifyToken = (token) => {

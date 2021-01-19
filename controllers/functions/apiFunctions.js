@@ -32,7 +32,7 @@ const registration = async(req, res) => {
     } else {
         const newUser = [req.name, req.email, req.password, req.phone];
         await base.addUser(newUser);
-        res.status(200).send({"token": createToken(user)});
+        res.status(200).send({"token": createToken({email: req.email, password: req.password})});
     }
 }
 
