@@ -115,9 +115,9 @@ const getItems = async (authorization, res) => {
 
 
 const getItem = async (req, res) => {
-        const {id, phone, name, email} = getUserData(req.headers.authorization);
+        const {id, phone, name, email} = await getUserData(req.headers.authorization);
         const userData = [JSON.stringify({id, phone, email, name}), req.params.id];
-        const item = await base.getItem(userData, id);
+        const item = await base.getItem(userData);
         res.status(200).send(item);
 }
 
