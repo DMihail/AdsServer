@@ -52,22 +52,33 @@ const getCurrentUser = async(authorization, res) => {
 
 const uploadItemImage = async (req, res) => {
     const mimeType = req.headers['content-type'].split('/')[1];
-    const {id, phone, name, email} = await getUserData(req.headers.authorization);
+    const data = await getUserData(req.headers.authorization);
+    if (data) {
+        const {id, phone, name, email} = data;
+        const userData = [JSON.stringify({id, phone, email, name}), req.params.id];
+        const pathPart = [`/${id}`, `/${req.params.id}`]
+        let path = 'public/images';
+        for (let i = 0; i < pathPart.length; i++) {
+            path += pathPart[i];
+            createFolders(path);
+        }
+        path = `${path}/image.${mimeType}`;
 
-    const pathPart = [`/${id}`, `/${req.params.id}`]
-    let path = 'public/images';
-    for (let i = 0; i < pathPart.length; i++) {
-        path += pathPart[i];
-        createFolders(path);
+        saveImage(req, res, path);
+
+        path = path.replace('public', 'http://localhost:3000');
+
+        const item = [path, req.params.id, JSON.stringify({id, phone, email, name})];
+        const update = await base.updateItemImage(item);
+        if (update) {
+            const result = await base.getItem(userData);
+            res.status(200).send(result);
+        } else {
+            res.status(500).send({});
+        }
+    } else {
+        res.status(403).send({});
     }
-    path = `${path}/image.${mimeType}`;
-
-    saveImage(req, res, path);
-
-    path = path.replace('public', 'http://localhost:3000');
-
-    const item = [path, req.params.id, JSON.stringify({id, phone, email, name})];
-    await base.updateItemImage(item);
 }
 
 const createItem = async (req, res) => {
@@ -135,13 +146,18 @@ const getItem = async (req, res = null) => {
 }
 
 const deleteItem = async (req, res) => {
-        const {id, phone, name, email} = await getUserData(req.headers.authorization);
-        const userData = [JSON.stringify({id, phone, email, name}), req.params.id];
-        const item = await base.deleteItem(userData, id);
-        if (item) {
-            res.status(200).send({});
+        const data = await getUserData(req.headers.authorization);
+        if (data) {
+            const {id, phone, name, email} = data
+            const userData = [JSON.stringify({id, phone, email, name}), req.params.id];
+            const item = await base.deleteItem(userData, id);
+            if (item) {
+                res.status(200).send({});
+            } else {
+                res.status(404).send({});
+            }
         } else {
-            res.status(404).send({});
+            res.status(401).send({});
         }
 }
 

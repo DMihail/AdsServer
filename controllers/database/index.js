@@ -103,7 +103,7 @@ module.exports = class Database {
 
     async updateItemImage(params) {
         try {
-            await this.connection.query(uploadImage, params);
+            return await this.connection.query(uploadImage, params);
         } catch (err) {
             console.log(err);
             return null;
