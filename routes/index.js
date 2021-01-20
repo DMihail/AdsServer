@@ -25,7 +25,15 @@ router.get('/api/items/:id', async function(req, res, next) {
 });
 
 router.put('/api/items/:id', async function(req, res, next) {
-  await updateItem(req, res);
+  passport.authenticate('item', async function(err, item, info) {
+    if (item) {
+      await updateItem(req, res);
+    } else if (info){
+      res.status(422).send(info);
+    } else {
+      res.status(404).send({});
+    }
+  })(req, res, next);
 });
 
 router.delete('/api/items/:id', async function(req, res, next) {
@@ -65,7 +73,7 @@ router.post('/api/items/:id/images', async function(req, res, next) {
 });
 
 router.post('/api/items', function(req, res, next) {
-  passport.authenticate('createItem', async function(err, item, info) {
+  passport.authenticate('item', async function(err, item, info) {
     if (item) {
       await createItem(req, res);
     } else {

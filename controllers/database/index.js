@@ -147,7 +147,7 @@ module.exports = class Database {
             return result[0];
         } catch (err) {
             console.log(err);
-            return [];
+            return null;
         }
     }
 
