@@ -16,7 +16,9 @@ app.set('view engine', 'pug');
 app.use(passport.initialize());
 app.use(passport.session());
 
+require('./controllers/passport/createItem')(passport);
 require('./controllers/passport/login')(passport);
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

@@ -35,6 +35,7 @@ router.delete('/api/items/:id', async function(req, res, next) {
 
 router.post('/api/login', function(req, res, next) {
   passport.authenticate('local', async function(err, user, info) {
+    console.log(info)
     if (user) {
       await login(req.body, res);
     } else {
@@ -54,8 +55,14 @@ router.post('/api/items/:id/images', async function(req, res, next) {
   await uploadItemImage(req, res);
 });
 
-router.post('/api/items',  async function(req, res, next) {
-  await createItem(req, res);
+router.post('/api/items', function(req, res, next) {
+  passport.authenticate('createItem', async function(err, item, info) {
+    if (item) {
+      await createItem(req, res);
+    } else {
+      res.status(422).send( info);
+    }
+  })(req, res, next);
 });
 
 module.exports = router;

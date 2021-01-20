@@ -1,8 +1,8 @@
 const LocalStrategy = require('passport-local').Strategy;
 const {findUserFromBase} = require('../functions/apiFunctions');
 
-module.exports = function (passport, req, res) {
-    passport.use(new LocalStrategy({
+module.exports = function (passport) {
+    passport.use('local', new LocalStrategy({
             usernameField: 'email',
             passwordField: 'password',
             session: false
