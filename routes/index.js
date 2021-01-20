@@ -30,7 +30,7 @@ router.put('/api/items/:id', async function(req, res, next) {
       await updateItem(req, res);
     } else if (info){
       res.status(422).send(info);
-    } else {
+    } else if (!item){
       res.status(404).send({});
     }
   })(req, res, next);

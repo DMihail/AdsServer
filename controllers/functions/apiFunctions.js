@@ -18,7 +18,7 @@ const getUserData = async (authorization) => {
     }
 
     const data = await base.getUser( [user.email, user.password ]);
-    return {id, phone, name, email} = data[0];
+     return {id, phone, name, email} = data[0];
 
 }
 
@@ -131,7 +131,7 @@ const getItems = async (authorization, res) => {
 
 const getItem = async (req, res = null) => {
         const {id, phone, name, email} = await getUserData(req.headers.authorization);
-        const userData = [JSON.stringify({id, phone, email, name}), req.params.id];
+        const userData = [JSON.stringify({id, phone, email, name}), +req.params.id];
         const item = await base.getItem(userData);
         if (res) {
             if (item.length) {
@@ -162,12 +162,13 @@ const deleteItem = async (req, res) => {
 }
 
 const updateItem = async (req, res) => {
-        const {id, phone, name, email} = getUserData(req.headers.authorization);
-        const userData = [req.body.title, req.body.price,  req.params.id, JSON.stringify({id, phone, email, name}),];
+        const {id, phone, name, email} = await getUserData(req.headers.authorization);
+        const user = JSON.stringify({id, phone, email, name});
+        const userData = [req.body.title, req.body.price,  +req.params.id, user];
         try {
-            await base.updateItem(userData, id);
-            const item = await base.getItem(userData);
-                res.status(200).send(item);
+            await base.updateItem(userData);
+            const item = await base.getItem([user, id]);
+            res.status(200).send(item[0]);
         } catch (e) {
             res.status(403).send({});
         }

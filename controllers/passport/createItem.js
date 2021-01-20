@@ -24,7 +24,7 @@ module.exports = function (passport) {
 
             if (req.headers.authorization) {
                 const item = await getItem(req);
-                if (item) {
+                 if (!item) {
                     done(null, false);
                 }
             }
