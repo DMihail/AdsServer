@@ -18,6 +18,7 @@ app.use(passport.session());
 
 require('./controllers/passport/createItem')(passport);
 require('./controllers/passport/login')(passport);
+require('./controllers/passport/register')(passport);
 
 app.use(logger('dev'));
 app.use(express.json());

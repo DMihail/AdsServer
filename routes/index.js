@@ -40,7 +40,7 @@ router.post('/api/login', function(req, res, next) {
       await login(req.body, res);
     } else {
       res.status(422).send({
-        "field":"password",
+        "field": info,
         "message":"Wrong email or password"
       });
     }
@@ -48,7 +48,16 @@ router.post('/api/login', function(req, res, next) {
 });
 
 router.post('/api/register',  async function(req, res, next) {
-  await registration(req.body, res);
+  passport.authenticate('register', async function(err, user, info) {
+    if (user) {
+      await registration(req.body, res);
+    } else {
+      res.status(422).send({
+        "field": info,
+        "message":"Wrong email or password"
+      });
+    }
+  })(req, res, next);
 });
 
 router.post('/api/items/:id/images', async function(req, res, next) {

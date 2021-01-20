@@ -29,11 +29,10 @@ const registration = async(req, res) => {
             "field":"email",
             "message":"email is exist"
         });
-    } else {
+    }
         const newUser = [req.name, req.email, req.password, req.phone];
         await base.addUser(newUser);
         res.status(200).send({"token": createToken({email: req.email, password: req.password})});
-    }
 }
 
 const getCurrentUser = async(authorization, res) => {
