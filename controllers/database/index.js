@@ -95,7 +95,6 @@ module.exports = class Database {
            const result = await this.connection.query(insertItem, item);
            return result[0];
         } catch (err) {
-            console.log(1111111111111)
             console.log(err);
             return null;
         }
@@ -121,7 +120,6 @@ module.exports = class Database {
     }
 
     async getItem(user) {
-        console.log(user)
         try {
             const result = await this.connection.query(selectItem, user);
             return result[0];

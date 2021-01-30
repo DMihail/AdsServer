@@ -54,8 +54,7 @@ const uploadItemImage = async (req, res) => {
     const mimeType = req.headers['content-type'].split('/')[1];
     const data = await getUserData(req.headers.authorization);
     if (data) {
-        const {id, phone, name, email} = data;
-        const userData = [JSON.stringify({id, phone, email, name}), req.params.id];
+        const {id} = data;
         const pathPart = [`/${id}`, `/${req.params.id}`]
         let path = 'public/images';
         for (let i = 0; i < pathPart.length; i++) {
@@ -67,12 +66,11 @@ const uploadItemImage = async (req, res) => {
         saveImage(req, res, path);
 
         path = path.replace('public', 'http://localhost:3000');
-
-        const item = [path, req.params.id, JSON.stringify({id, phone, email, name})];
+        const item = [path, req.params.id, id];
         const update = await base.updateItemImage(item);
         if (update) {
-            const result = await base.getItem(userData);
-            res.status(200).send(result);
+            const result = await base.getItem([id, req.params.id]);
+            res.status(200).send(createItemsResponse(result));
         } else {
             res.status(500).send({});
         }
@@ -87,30 +85,14 @@ const createItem = async (req, res) => {
     const data = await getUserData(req.headers.authorization);
 
     if (data) {
-        const {id, phone, name, email} = data;
-        const item = [date, req.body.title, req.body.price, "", id, JSON.stringify({id, phone, email, name})];
-
-        const result = await base.createItem(item);
-
-        const endItem = {
-            id: result.insertId,
-            created_at: date,
-            title: req.body.title,
-            price: req.body.price,
-            image: "",
-            user_id: id,
-            user: {
-                id: id,
-                phone: phone,
-                name: name,
-                email: email
-            }
-        }
-
+        const {id} = data;
+        const item = [date, req.body.title, req.body.price, "", +id];
+        const createItem = await base.createItem(item);
+        const result = await base.getItem([+id, +createItem.insertId]);
         if (!result) {
             res.status(403).send({});
         } else {
-            res.status(200).send(endItem);
+            res.status(200).send(createItemsResponse(result));
         }
     } else {
         res.status(401).send({});
@@ -118,21 +100,42 @@ const createItem = async (req, res) => {
 }
 
 const getItems = async (authorization, res) => {
-        const {id, phone, name, email} = await getUserData(authorization);
-        const userData = JSON.stringify({id, phone, email, name});
-        const items = await base.getItems(userData);
-         if (items.length) {
-             res.status(200).send(items);
+        const {id} = await getUserData(authorization);
+        const items = await base.getItems([id]);
+        const newItems = createItemsResponse(items);
+         if (newItems.length) {
+             res.status(200).send(newItems);
             } else {
                 res.status(404).send({});
             }
 }
 
+const createItemsResponse = (massItems) => {
+    const newMassItems = [];
+    for (let i = 0; i < massItems.length; i++) {
+        const obj = {
+            id: massItems[i].id,
+            created_at: massItems[i].created_at,
+            title: massItems[i].title,
+            price: massItems[i].price,
+            image: massItems[i].image,
+            user_id: massItems[i].user_id,
+            user: {
+                id: massItems[i].user_id,
+                phone: massItems[i].phone,
+                name: massItems[i].name,
+                email: massItems[i].email
+                 }
+            }
+        newMassItems.push(obj);
+    }
+    return newMassItems;
+}
+
 
 const getItem = async (req, res = null) => {
-        const {id, phone, name, email} = await getUserData(req.headers.authorization);
-        const userData = [JSON.stringify({id, phone, email, name}), +req.params.id];
-        const item = await base.getItem(userData);
+        const {id} = await getUserData(req.headers.authorization);
+        const item = await base.getItem([id, +req.params.id]);
         if (res) {
             if (item.length) {
                 res.status(200).send(item);
@@ -148,9 +151,8 @@ const getItem = async (req, res = null) => {
 const deleteItem = async (req, res) => {
         const data = await getUserData(req.headers.authorization);
         if (data) {
-            const {id, phone, name, email} = data
-            const userData = [JSON.stringify({id, phone, email, name}), req.params.id];
-            const item = await base.deleteItem(userData, id);
+            const {id} = data
+            const item = await base.deleteItem([id, +req.params.id]);
             if (item) {
                 res.status(200).send({});
             } else {
@@ -162,13 +164,11 @@ const deleteItem = async (req, res) => {
 }
 
 const updateItem = async (req, res) => {
-        const {id, phone, name, email} = await getUserData(req.headers.authorization);
-        const user = JSON.stringify({id, phone, email, name});
-        const userData = [req.body.title, req.body.price,  +req.params.id, user];
+        const {id} = await getUserData(req.headers.authorization);
         try {
-            await base.updateItem(userData);
-            const item = await base.getItem([user, id]);
-            res.status(200).send(item[0]);
+            await base.updateItem([req.body.title, req.body.price, +req.params.id, id]);
+            const item = await base.getItem([id, +req.params.id]);
+            res.status(200).send(createItemsResponse(item));
         } catch (e) {
             res.status(403).send({});
         }
