@@ -5,7 +5,6 @@ const base = new Database();
 
 const login = async (req, res) => {
     const user = await base.getUser([req.email, req.password]);
-    console.log(user)
     if (user) {
         res.status(200).send({"token": createToken(user)});
     }
@@ -18,7 +17,10 @@ const getUserData = async (authorization) => {
     }
 
     const data = await base.getUser( [user.email, user.password ]);
-     return {id, phone, name, email} = data[0];
+    if (data) {
+        return {id, phone, name, email} = data[0];
+    }
+    return null;
 
 }
 
@@ -31,13 +33,16 @@ const registration = async(req, res) => {
         });
     }
         const newUser = [req.name, req.email, req.password, req.phone];
-        await base.addUser(newUser);
-        res.status(200).send({"token": createToken({email: req.email, password: req.password})});
+        const add = await base.addUser(newUser);
+        if (!add) {
+            res.status(500).send({});
+        } else {
+            res.status(200).send({"token": createToken({email: req.email, password: req.password})});
+        }
 }
 
 const getCurrentUser = async(authorization, res) => {
     const userData = await getUserData(authorization);
-    console.log(userData)
     if (userData) {
         res.status(200).send({
         "id": userData.id,
@@ -100,14 +105,19 @@ const createItem = async (req, res) => {
 }
 
 const getItems = async (authorization, res) => {
-        const {id} = await getUserData(authorization);
-        const items = await base.getItems([id]);
-        const newItems = createItemsResponse(items);
-         if (newItems.length) {
-             res.status(200).send(newItems);
+        const data = await getUserData(authorization);
+        if (data) {
+            const {id} = data;
+            const items = await base.getItems([id]);
+            const newItems = createItemsResponse(items);
+            if (newItems.length) {
+                res.status(200).send(newItems);
             } else {
                 res.status(404).send({});
             }
+        } else {
+            res.status(500).send({});
+        }
 }
 
 const createItemsResponse = (massItems) => {
@@ -134,16 +144,21 @@ const createItemsResponse = (massItems) => {
 
 
 const getItem = async (req, res = null) => {
-        const {id} = await getUserData(req.headers.authorization);
-        const item = await base.getItem([id, +req.params.id]);
-        if (res) {
-            if (item.length) {
-                res.status(200).send(item);
+        const data = await getUserData(req.headers.authorization);
+        if (data) {
+            const {id} = data
+            const item = await base.getItem([id, +req.params.id]);
+            if (res) {
+                if (item.length) {
+                    res.status(200).send(item);
+                } else {
+                    res.status(404).send({});
+                }
             } else {
-                res.status(404).send({});
+                return item[0];
             }
         } else {
-            return item[0];
+            res.status(500).send({});
         }
 
 }
@@ -164,16 +179,19 @@ const deleteItem = async (req, res) => {
 }
 
 const updateItem = async (req, res) => {
-        const {id} = await getUserData(req.headers.authorization);
-        try {
-            await base.updateItem([req.body.title, req.body.price, +req.params.id, id]);
-            const item = await base.getItem([id, +req.params.id]);
-            res.status(200).send(createItemsResponse(item));
-        } catch (e) {
-            res.status(403).send({});
+        const data = await getUserData(req.headers.authorization);
+        if (data) {
+            const {id} = data;
+            try {
+                await base.updateItem([req.body.title, req.body.price, +req.params.id, id]);
+                const item = await base.getItem([id, +req.params.id]);
+                res.status(200).send(createItemsResponse(item));
+            } catch (e) {
+                res.status(403).send({});
+            }
+        } else {
+            res.status(500).send({})
         }
-
-
 }
 
 const findUserFromBase = async (email, password) => {

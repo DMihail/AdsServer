@@ -1,52 +1,26 @@
 const mysql = require('mysql2/promise');
-const {massTable, createBase, useBase, insertUser,
+const {password, host, user} = require('../../config/index');
+const {useBase, insertUser,
     findUser, insertItem, uploadImage, selectAllItems,
     selectItem, updateItem, deleteItem} = require('./mySqlCommand');
 
 module.exports = class Database {
     constructor() {
         this.connection = mysql.createPool({
-            host: 'localhost',
-            user: 'root',
-            password: "root",
+            host: host,
+            user: user,
+            password: password,
             waitForConnections: true,
             connectionLimit: 10,
             queueLimit: 0
         });
-        this.createBase().then({
-
-        }).catch(e => {
-            console.log(e)
-        })
-    }
-
-    async createBase() {
-        try {
-            await this.connection.query(createBase)
-            console.log("База данных создана");
-        } catch (err){
-            console.log(err);
-        }
-        await this.useBase();
+        this.useBase();
     }
 
     async useBase() {
         try {
             await this.connection.query(useBase)
             console.log("База данных используется");
-        } catch (err) {
-            console.log(err);
-        }
-
-        for (let i = 0; i < massTable.length; i++) {
-            await this.createTable(massTable[i]);
-        }
-    }
-
-    async createTable(table){
-        try{
-            await this.connection.query(table);
-            console.log("Таблица создана");
         } catch (err) {
             console.log(err);
         }
